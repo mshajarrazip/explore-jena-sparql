@@ -1,0 +1,17 @@
+[project]
+name = "explore-jena-sparql"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Hajar Razip", email = "mshajarrazip@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+explore-jena-sparql = "explore_jena_sparql:main"
+
+[build-system]
+requires = ["uv_build>=0.12.22,<0.13.0"]
+build-backend = "uv_build"
