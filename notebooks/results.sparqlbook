@@ -1,0 +1,20 @@
+[
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "# SPARQL RESULTS",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\nPREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?y ?firstName\nWHERE {\n  ?y vcard:Given ?firstName .\n}\nORDER BY ?firstName",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "",
+    "metadata": {}
+  }
+]

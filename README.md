@@ -98,13 +98,36 @@ curl -X POST http://localhost:3030/ds/data \
 
 💡 You can also load data with `INSERT DATA` (see step 6).
 
-To load every file in [`data/`](data/) at once, run [`scripts/load-data.sh`](scripts/load-data.sh). It puts all the files into the default graph, so queries work without `FROM` or `GRAPH`. Each run clears the default graph and reloads every file, so running it again doesn't duplicate blank nodes. After each upload it queries Fuseki to check that the triples arrived, and it exits with an error if a file fails to parse or is empty.
+### Load the files in `data/` with `scripts/load-data.sh`
+
+[`scripts/load-data.sh`](scripts/load-data.sh) loads the files in [`data/`](data/) into Fuseki. Triple files (`.ttl`, `.rdf`, ...) go into the default graph, so queries work without `FROM` or `GRAPH`. Quad files (`.trig`, `.nq`) also fill the named graphs they declare.
+
+Run it without arguments to list the files. Each file has a number, and `loaded` marks the files that are in Fuseki:
+
+```console
+$ scripts/load-data.sh
+  1  ds.trig                        loaded
+  2  people.ttl
+
+load with --upload, remove with --purge; pick files with --filter N[,N...]
+```
+
+Then load or remove files, using the numbers to pick them:
 
 ```bash
-scripts/load-data.sh            # clear the default graph, then load every file
-scripts/load-data.sh --reset    # wipe the whole dataset, then load every file
-scripts/load-data.sh --purge    # wipe the whole dataset and load nothing
+scripts/load-data.sh --upload               # load every file
+scripts/load-data.sh --upload --filter 2    # load file 2, keep what's already loaded
+scripts/load-data.sh --purge --filter 1     # remove file 1, keep the rest
+scripts/load-data.sh --purge                # remove everything
+scripts/load-data.sh --filter 1,2           # list files 1 and 2 only
+scripts/load-data.sh --help                 # show all options
 ```
+
+- **`--filter`** takes a comma-separated list (`--filter 1,3`) or can be repeated (`--filter 1 --filter 3`). The numbers follow the sorted file names, so adding a file to `data/` can change them. Check the list before you filter.
+- **After each upload**, the script queries Fuseki to check that the triples arrived. It exits with an error if a file fails to parse or is empty. At the end it prints the file list again, with the triple counts.
+- **Reloading is safe.** Fuseki can't tell which triples came from which file, so the script records the loaded files in `.load-data-state` and rebuilds the dataset from that list on every `--upload` or `--purge`. Uploading a loaded file again doesn't duplicate its blank nodes, and purging one file leaves the others in place.
+- ⚠️ **Each `--upload` or `--purge` removes any other data in the dataset**, such as triples you added with `curl` or `INSERT DATA`. To keep data, put it in a file in `data/`.
+- **Settings:** set `FUSEKI_URL` to use a different dataset (default `http://localhost:3030/ds`) and `DATA_DIR` to load a different folder.
 
 ⚠️ All the files are merged into one graph. If two files describe the same thing with blank nodes, each file adds its own copy, and queries return a row for each copy. So describe each resource in only one file. [`data/people.ttl`](data/people.ttl) merges the Jena tutorial files this way. The original tutorial files are kept in `data-archive/`, which the script doesn't load.
 

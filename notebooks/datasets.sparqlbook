@@ -1,0 +1,50 @@
+[
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "# SPARQL Datasets\n\nSource: [Apache Jena > Tutorials > SPARQL Datasets](https://jena.apache.org/tutorials/sparql_datasets.html)",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX : <.>\n\nSELECT * {?s ?p ?o}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX : <http://example.org/>\n\nSELECT * {\n  {?s ?p ?o} UNION {\n    GRAPH ?g {?s ?p ?o}\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX : <http://example.org/>\n\nSELECT ?title \n{\n  GRAPH :ds-ng-2.ttl\n  {\n    ?b dc:title ?title\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX : <http://example.org/>\n\nSELECT ?date ?title {\n  ?g dc:date ?date .\n  FILTER (?date > \"2005-08-01T00:00:00Z\"^^xsd:dateTime )\n  GRAPH ?g {\n    ?b dc:title ?title\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "`FROM` and `FROM NAMED`",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX : <http://example.org/>\n\nSELECT *\nFROM       :ds-dft.ttl\nFROM NAMED :ds-ng-1.ttl\nFROM NAMED :ds-ng-2.ttl\n{\n   { ?s ?p ?o } UNION { GRAPH ?g { ?s ?p ?o } }\n}",
+    "metadata": {}
+  }
+]

@@ -1,0 +1,27 @@
+# The RDF dataset from the Apache Jena SPARQL tutorial, "SPARQL Datasets"
+# (https://jena.apache.org/tutorials/sparql_datasets.html), in one TriG file.
+# The tutorial ships it as ds-dft.ttl (default graph) plus ds-ng-1.ttl and
+# ds-ng-2.ttl (named graphs); the originals are in data-archive/.
+#
+# @base makes <ds-ng-1.ttl> an absolute IRI, so the subjects of dc:date in the
+# default graph are exactly the names of the named graphs below.
+@base <http://example.org/> .
+@prefix dc:  <http://purl.org/dc/elements/1.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Default graph: when each named graph was last changed.
+# The tutorial writes the timezone as +0100, which is not a valid xsd:dateTime
+# (it must be +01:00), so date comparisons in FILTERs failed. Fixed here.
+<ds-ng-1.ttl> dc:date "2005-07-14T03:18:56+01:00"^^xsd:dateTime .
+<ds-ng-2.ttl> dc:date "2005-09-22T05:53:05+01:00"^^xsd:dateTime .
+
+# "Philospher's" is spelled this way in the tutorial's data
+<ds-ng-1.ttl> {
+    [] dc:title "Harry Potter and the Philospher's Stone" .
+    [] dc:title "Harry Potter and the Chamber of Secrets" .
+}
+
+<ds-ng-2.ttl> {
+    [] dc:title "Harry Potter and the Sorcerer's Stone" .
+    [] dc:title "Harry Potter and the Chamber of Secrets" .
+}
