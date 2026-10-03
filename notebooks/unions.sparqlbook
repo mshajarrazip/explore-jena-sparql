@@ -1,0 +1,56 @@
+[
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "# SPARQL UNION\n\nOriginal: [Apache Jena > Tutorials > SPARQL UNION](https://jena.apache.org/tutorials/sparql_union.html)",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX foaf: <http://xlmns.com/foaf/0.1/>\nPREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?name\nWHERE {\n  {\n    [] foaf:name ?name\n  } UNION {\n    [] vCard:FN ?name\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX foaf: <http://xmlns.com/foaf/0.1/>\nPREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?p ?name\nWHERE {\n  [] ?p ?name\n  FILTER (\n    ?p = foaf:name || ?p = vCard:FN \n  )\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## `UNION` - remembering where the data was found",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX foaf: <http://xmlns.com/foaf/0.1/>\nPREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?name1 ?name2\nWHERE {\n  {\n    [] foaf:name ?name1\n  } UNION {\n    [] vCard:FN ?name2\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX foaf: <http://xmlns.com/foaf/0.1/>\nPREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?p1 ?name1 ?p2 ?name2\nWHERE {\n  {\n    [] ?p1 ?name1 \n    FILTER ( ?p1 = foaf:name )\n  } UNION {\n    [] ?p2 ?name2\n    FILTER ( ?p2 = vCard:FN )\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## `OPTIONAL` and `UNION`",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX foaf: <http://xmlns.com/foaf/0.1/>\nPREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?name1 ?name2\nWHERE\n{\n  ?x a foaf:Person\n  OPTIONAL { ?x  foaf:name  ?name1 }\n  OPTIONAL { ?x  vCard:FN   ?name2 }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "",
+    "metadata": {}
+  }
+]

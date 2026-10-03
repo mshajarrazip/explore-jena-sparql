@@ -4,6 +4,16 @@ A local [Apache Jena Fuseki](https://jena.apache.org/documentation/fuseki2/) SPA
 
 I used this to follow the [Jena SPARQL tutorial](https://jena.apache.org/tutorials/sparql_data.html).
 
+## Sample data
+
+The data in [`data/`](data/) comes from the example files in the [Apache Jena SPARQL tutorial](https://jena.apache.org/tutorials/sparql_data.html). Claude combined and optimized them into one file, [`data/people.ttl`](data/people.ttl):
+
+- `vc-db-2.rdf` and `vc-db-2.2.rdf` are merged, so each person is described once and has a single `vCard:N` node. Loading both originals would give every person two `vCard:N` blank nodes, and every query through `vCard:N` would return each person twice.
+- `vc-db-1.rdf` is left out because `vc-db-2.rdf` contains all of it.
+- `turtle1.ttl` is left out because it only repeats names already in the merged file, on blank nodes instead of the people's IRIs.
+
+The result has 26 triples, all unique, and keeps both the `vCard` and `foaf` names. The original files are in [`data-archive/`](data-archive/), which the load script (step 4) doesn't read.
+
 ## Prerequisites
 
 - Docker with the Compose plugin (`docker compose version`)
@@ -87,6 +97,16 @@ curl -X POST http://localhost:3030/ds/data \
 ```
 
 💡 You can also load data with `INSERT DATA` (see step 6).
+
+To load every file in [`data/`](data/) at once, run [`scripts/load-data.sh`](scripts/load-data.sh). It puts all the files into the default graph, so queries work without `FROM` or `GRAPH`. Each run clears the default graph and reloads every file, so running it again doesn't duplicate blank nodes. After each upload it queries Fuseki to check that the triples arrived, and it exits with an error if a file fails to parse or is empty.
+
+```bash
+scripts/load-data.sh            # clear the default graph, then load every file
+scripts/load-data.sh --reset    # wipe the whole dataset, then load every file
+scripts/load-data.sh --purge    # wipe the whole dataset and load nothing
+```
+
+⚠️ All the files are merged into one graph. If two files describe the same thing with blank nodes, each file adds its own copy, and queries return a row for each copy. So describe each resource in only one file. [`data/people.ttl`](data/people.ttl) merges the Jena tutorial files this way. The original tutorial files are kept in `data-archive/`, which the script doesn't load.
 
 ## 5. Query
 

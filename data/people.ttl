@@ -1,0 +1,39 @@
+# vc-db-2.rdf and vc-db-2.2.rdf from the Jena SPARQL tutorial, merged so each
+# person is described once (one vCard:N node per person).
+@prefix vCard: <http://www.w3.org/2001/vcard-rdf/3.0#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix info:  <http://somewhere/peopleInfo#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+# vCard:FN and foaf:name both present, same value
+<http://somewhere/JohnSmith>
+    a foaf:Person ;
+    vCard:FN "John Smith" ;
+    foaf:name "John Smith" ;
+    info:age "25"^^xsd:integer ;
+    vCard:N [ vCard:Family "Smith" ; vCard:Given "John" ] .
+
+# vCard:FN and foaf:name both present, different values
+<http://somewhere/RebeccaSmith>
+    a foaf:Person ;
+    vCard:FN "Becky Smith" ;
+    foaf:name "Rebecca Smith" ;
+    info:age "23"^^xsd:integer ;
+    vCard:N [ vCard:Family "Smith" ; vCard:Given "Rebecca" ] .
+
+# only vCard:FN
+<http://somewhere/SarahJones>
+    a foaf:Person ;
+    vCard:FN "Sarah Jones" ;
+    vCard:N [ vCard:Family "Jones" ; vCard:Given "Sarah" ] .
+
+# vc-db-2.rdf gives a vCard:FN, vc-db-2.2.rdf gives a different foaf:name
+<http://somewhere/MattJones>
+    a foaf:Person ;
+    vCard:FN "Matt Jones" ;
+    foaf:name "Matthew Jones" ;
+    vCard:N [ vCard:Family "Jones" ; vCard:Given "Matthew" ] .
+
+# neither vCard:FN nor foaf:name
+<http://somewhere/AdamJones>
+    a foaf:Person .
