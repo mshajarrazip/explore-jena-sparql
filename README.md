@@ -2,7 +2,7 @@
 
 A local [Apache Jena Fuseki](https://jena.apache.org/documentation/fuseki2/) SPARQL server backed by a persistent [TDB2](https://jena.apache.org/documentation/tdb2/) store, run with Docker Compose.
 
-This guide assumes you already know RDF and SPARQL. It only covers how to run Fuseki in this repo and send data and queries to it. If you need a refresher on SPARQL, see the [Jena SPARQL tutorial](https://jena.apache.org/tutorials/sparql_data.html).
+I used this to follow the [Jena SPARQL tutorial](https://jena.apache.org/tutorials/sparql_data.html).
 
 ## Prerequisites
 
@@ -159,6 +159,35 @@ curl http://localhost:3030/ds/data -H 'Accept: application/trig' > dump.trig
   ```bash
   docker compose logs -f fuseki
   ```
+
+## 9. Query from a VS Code notebook
+
+You can run queries against Fuseki from a notebook in VS Code with the [SPARQL Notebook](https://marketplace.visualstudio.com/items?itemName=Zazuko.sparql-notebook) extension (`zazuko.sparql-notebook`). Installing it also pulls in the Stardog extensions for SPARQL syntax highlighting and auto-completion.
+
+1. **Install the extension.**
+   ```bash
+   code --install-extension zazuko.sparql-notebook
+   ```
+   Or search for "SPARQL Notebook" in the Extensions view. If `code` isn't found, run **Shell Command: Install 'code' command in PATH** from the Command Palette first.
+2. **Start the server** (step 1) and load some data (step 4).
+3. **Open a notebook.** Open [`notebooks/queries.sparqlbook`](notebooks/queries.sparqlbook), or create a new file ending in `.sparqlbook`. VS Code opens it as a notebook. If it opens as plain JSON, right-click the file, pick **Open With...**, and choose **SPARQL Notebook**.
+4. **Point each cell at Fuseki.** Put this comment at the top of every code cell:
+   ```sparql
+   # [endpoint=http://localhost:3030/ds/sparql]
+   SELECT * WHERE { ?s ?p ?o } LIMIT 10
+   ```
+   The comment is saved in the `.sparqlbook` file, so the endpoint goes into version control with the notebook. The cells in `notebooks/queries.sparqlbook` already have it.
+5. **Run a cell.** Press Ctrl+Enter (Option+Enter on macOS), or click the run button next to the cell. The cell's status bar shows which endpoint it used.
+
+💡 **Optional: a default connection.** To skip the comment, add a connection in the extension's **Connections** panel. Open it from the **Sparql Notebook** icon in the activity bar, or run **Sparql Notebook: Focus on Connections View** from the Command Palette. If the icon is missing, right-click the activity bar and tick **Sparql Notebook**. Click **+**, enter `http://localhost:3030/ds/sparql` with no user or password, then click the plug icon to connect. Cells without an endpoint comment use this connection. The extension saves connections in your VS Code user profile, not in the repo, so everyone who clones the repo has to add the connection themselves.
+
+💡 To run a query that lives in a file such as [`queries/q1.rq`](queries/q1.rq), use **Add Query from File...** in the cell toolbar. The cell loads the file when it runs, and saving the notebook also saves the file.
+
+💡 To show SELECT results as a table by default: in a cell's output, switch the renderer to `application/sparql-results+json`, then run **Notebook: Save Mimetype Display Order** from the Command Palette.
+
+⚠️ The notebook runs queries only (SELECT, ASK, CONSTRUCT, DESCRIBE). Send updates with `curl` as in step 6.
+
+⚠️ Right-clicking an RDF file and choosing **SPARQL Notebook: Use File as Store** queries that file in an in-memory store inside VS Code. It doesn't touch Fuseki.
 
 ## Notes
 

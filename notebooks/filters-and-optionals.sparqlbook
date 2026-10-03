@@ -1,0 +1,98 @@
+[
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\nSELECT * WHERE { ?s ?p ?o } LIMIT 10",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Qname",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\nPREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?y ?firstName\nWHERE {\n  ?y vcard:Family \"Smith\" .\n  ?y vcard:Given ?firstName .\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?p ?firstName\nWHERE {\n  ?p vcard:N ?y .\n  ?y vcard:Family \"Smith\" .\n  ?y vcard:Given ?firstName .\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?g\nWHERE {\n  ?y vcard:Given ?g .\n  FILTER regex(?g, \"r\", \"i\")\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Testing Values\n\n```\n<http://somewhere/RebeccaSmith/>\n    info:age \"23\"^^xsd:integer ;\n    vCard:FN \"Becky Smith\" ;\n    vCard:N [ vCard:Family \"Smith\" ;\n              vCard:Given  \"Rebecca\" ] .\n```",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX info: <http://somewhere/peopleInfo#>\n\nSELECT ?resource\nWHERE {\n  ?resource info:age ?age .\n  FILTER (?age >= 24)\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## `OPTIONAL`s",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX info: <http://somewhere/peopleInfo#>\nPREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?name ?age \nWHERE {\n  ?person vcard:FN ?name .\n  OPTIONAL {\n    ?person info:age ?age\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX info: <http://somewhere/peopleInfo#>\nPREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?name ?age \nWHERE {\n  ?person vcard:FN ?name ; info:age ?age\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## `OPTIONAL`s with `FILTER`s",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX info: <http://somewhere/peopleInfo#>\nPREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?name ?age\nWHERE {\n  ?person vcard:FN ?name .\n  OPTIONAL {\n    ?person info:age ?age .\n    FILTER (\n      ?age > 24\n    )\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# If a solution has an age variable, then it must be greater than 24. It can also be unbound. There are now three solutions:\n\n# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX info: <http://somewhere/peopleInfo#>\nPREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?name ?age \nWHERE {\n  ?person vcard:FN ?name .\n  OPTIONAL {\n    ?person info:age ?age .\n  }\n  FILTER (\n    !bound(?age) || ?age > 24\n  )\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### `bound` vs `EXISTS`\n\n`bound(?age)` asks one thing: **does `?age` have a value in this result row?** It's about a variable in the result, not about a resource or a predicate.\n\nIn the query above it lines up with \"has an age\" only because of how `?age` gets its value:\n\n- `?age` is set only by `OPTIONAL { ?person info:age ?age }`.\n- So `?age` is bound exactly when that person has an `info:age` triple.\n\nIf `?age` were set some other way (`BIND`, a `UNION` branch, ...), `bound(?age)` would just report whether that happened.\n\nTo ask \"does this resource have this predicate?\" directly, use `EXISTS` / `NOT EXISTS`:\n\n```sparql\nFILTER NOT EXISTS { ?person info:age ?a }   # people with no age\nFILTER EXISTS     { ?person info:age ?a }   # people with an age\n```\n\nThe same query written that way:\n\n```sparql\nSELECT ?name ?age\nWHERE {\n  ?person vcard:FN ?name .\n  OPTIONAL { ?person info:age ?age }\n  FILTER (NOT EXISTS { ?person info:age ?a } || ?age > 24)\n}\n```\n\nBoth return the same rows here.\n\n- **`bound`**: did a variable get a value?\n- **`EXISTS` / `NOT EXISTS`**: is some data present in the graph?",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## `OPTIONAL`s and Order Dependent Queries",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "sparql",
+    "value": "# [endpoint=http://localhost:3030/ds/sparql]\n\nPREFIX foaf: <http://xmlns.com/foaf/0.1/>\nPREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>\n\nSELECT ?name\nWHERE\n{\n  ?x a foaf:Person .\n  OPTIONAL { ?x foaf:name ?name }\n  OPTIONAL { ?x vCard:FN  ?name }\n}\n",
+    "metadata": {}
+  }
+]
